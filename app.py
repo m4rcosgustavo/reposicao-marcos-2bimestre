@@ -3,10 +3,15 @@ import math
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 import database
+from auth import auth_bp
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "trocar-por-chave-secreta"
 
 database.criar_banco()
+
+app.register_blueprint(auth_bp)
+
 
 @app.route("/")
 def index():
@@ -16,6 +21,9 @@ def index():
 
 @app.route("/treinos/novo", methods=["GET", "POST"])
 def novo_treino():
+     if "usuario_id" not in session:
+        return redirect(url_for("auth.login"))
+
     if request.method == "POST":
         titulo = request.form["titulo"]
         tipo = request.form["tipo"]
@@ -29,6 +37,9 @@ def novo_treino():
 
 @app.route("/treinos/<int:treino_id>/editar", methods=["GET", "POST"])
 def editar_treino(treino_id):
+     if "usuario_id" not in session:
+        return redirect(url_for("auth.login"))
+
     treino = database.buscar_treino(treino_id)
     if treino is None:
         return "Treino não encontrado", 404
@@ -46,6 +57,9 @@ def editar_treino(treino_id):
 
 @app.post("/treinos/<int:treino_id>/concluir")
 def concluir_treino(treino_id):
+     if "usuario_id" not in session:
+        return redirect(url_for("auth.login"))
+
     database.alternar_concluido(treino_id)
     flash("Status do treino atualizado.")
     return redirect(url_for("index"))
@@ -53,32 +67,11 @@ def concluir_treino(treino_id):
 
 @app.post("/treinos/<int:treino_id>/excluir")
 def excluir_treino(treino_id):
+        if "usuario_id" not in session:
+            return redirect(url_for("auth.login"))
+            
     database.excluir_treino(treino_id)
     flash("Treino excluído.")
-    return redirect(url_for("index"))
-
-
-@app.route("/registro", methods=["GET", "POST"])
-def registro():
-    if request.method == "POST":
-        flash("Implemente o cadastro com hash de senha.")
-        return redirect(url_for("registro"))
-
-    return render_template("registro.html")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        flash("Implemente o login com session.")
-        return redirect(url_for("login"))
-
-    return render_template("login.html")
-
-
-@app.route("/logout")
-def logout():
-    flash("Implemente o logout com session.")
     return redirect(url_for("index"))
 
 

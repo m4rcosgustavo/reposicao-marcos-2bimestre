@@ -25,3 +25,6 @@ Acesse `http://127.0.0.1:5000`.
 ## Observação
 
 Não substitua a aplicação por outro projeto. A tarefa é adaptar esta base para autenticação com `session`, completando o módulo `auth.py` e mantendo as rotas de treinos em `app.py`.
+
+## JUSTIFICATIVA
+- 1. PARA MELHOR AUTENTIFICAÇÃO 
